@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import amazin.service.AmazonService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,7 @@ public class BookControllerIntegrationTest {
 
     private BookController controller;
     private BookService bookService;
+    private AmazonService amazonService;
 
     @Mock
     private BookRepository repo;
@@ -39,7 +41,8 @@ public class BookControllerIntegrationTest {
     @Before
     public void setUp() {
         bookService = new BookService(repo);
-        controller = new BookController(bookService);
+        amazonService = new AmazonService();
+        controller = new BookController(bookService, amazonService);
     }
 
     @Test

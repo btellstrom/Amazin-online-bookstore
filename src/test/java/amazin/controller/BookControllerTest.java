@@ -9,10 +9,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import amazin.service.AmazonService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,7 +24,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.support.BindingAwareModelMap;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.springframework.mock.web.MockMultipartFile;
 
 import amazin.BookTestUtil;
 import amazin.model.Book;
@@ -34,12 +42,13 @@ public class BookControllerTest {
 
     private BookController controller;
     private BookService bookService;
+    private AmazonService amazonService;
 
     @Before
     public void setUp() {
         bookService = mock(BookService.class);
         mock(HibernateSearchService.class);
-        controller = new BookController(bookService);
+        controller = new BookController(bookService, amazonService);
     }
 
     @Test
@@ -109,7 +118,19 @@ public class BookControllerTest {
 
         RedirectAttributesModelMap attributes = new RedirectAttributesModelMap();
 
-        String view = controller.addBook(formModel, result, attributes);
+        Path path = Paths.get("src/main/resources/public/images/icon.png");
+        String name = "icon.png";
+        String originalFileName = "icon.png";
+        String contentType = "image/xyz";
+        byte[] content = null;
+        try {
+            content = Files.readAllBytes(path);
+        } catch (final IOException e) {
+        }
+        MultipartFile image = new MockMultipartFile(name,
+                            originalFileName, contentType, content);
+
+        String view = controller.addBook(image, formModel, result, attributes);
 
         verify(bookService, times(1)).create(formModel);
         verifyNoMoreInteractions(bookService);
