@@ -6,4 +6,8 @@ target/
 .settings/
 .vscode/
 .DS_Store
+<<<<<<< HEAD
 searchIndex/
+=======
+application.yml
+>>>>>>> added application.yml to ignore list to make sure that credentials are not leaked
